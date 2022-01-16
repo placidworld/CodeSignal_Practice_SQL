@@ -1,0 +1,24 @@
+/* Solution 1 */
+CREATE PROCEDURE solution()
+BEGIN
+    SELECT  id, 
+            name, 
+            surname
+    FROM Suspect
+    WHERE height <= 170 
+    AND name like 'B%' 
+    AND surname like 'Gre_n'
+    ORDER BY id;
+END
+
+/* Solution 2 */
+CREATE PROCEDURE solution()
+BEGIN
+    SELECT  id, 
+            name, 
+            surname 
+    FROM Suspect AS s
+    WHERE s.height <= 170 
+    AND name LIKE "b%" 
+    AND surname LIKE "gre_n";
+END
