@@ -1,0 +1,54 @@
+/* Solution 1 */
+CREATE PROCEDURE solution()
+BEGIN
+    SELECT  WEEKDAY(mischief_date) AS "weekday", 
+            mischief_date, 
+            author, 
+            title
+    FROM mischief
+    ORDER BY weekday, 
+    FIELD(author, 'Huey', 'Dewey', 'Louie'), mischief_date, title;
+END
+
+
+/* Solution 2 */
+CREATE PROCEDURE mischievousNephews()
+BEGIN
+    SELECT  WEEKDAY(mischief_date) AS weekday, 
+            mischief_date,
+            author, 
+            title 
+    FROM mischief 
+    WHERE (author = "Huey") OR
+          (author = "Dewey") OR 
+           (author = "Louie") 
+    ORDER BY weekday,
+    FIELD(author, 'Huey', 'Dewey' ,'Louie'), mischief_date, title;
+END
+
+/* Solution 3 */
+CREATE PROCEDURE solution()
+BEGIN
+    SELECT  (DAYOFWEEK(mischief_date) + 5) MOD 7  AS weekday, 
+            mischief_date, 
+            author, 
+            title 
+    FROM mischief ORDER BY weekday, 
+    CASE author
+        WHEN 'Huey'  THEN 1
+        WHEN 'Dewey' THEN 2
+        WHEN 'Louie' THEN 3
+    ELSE 5 END, mischief_date, title;
+END
+
+/*Solution 4 */
+CREATE PROCEDURE solution()
+BEGIN
+    SELECT  MOD( DAYOFWEEK(mischief_date) + 5, 7 ) AS weekday, 
+            mischief_date, 
+            author, 
+            title 
+     FROM mischief
+     ORDER BY weekday, 
+     FIELD(author, 'Huey', 'Dewey' ,'Louie'), mischief_date, title;
+END
