@@ -1,0 +1,31 @@
+/* Solution 1 */
+CREATE PROCEDURE solution()
+BEGIN
+    SET @rowid = 0;
+    
+    SELECT DISTINCT buyer_name AS winner
+    FROM 
+        (
+        SELECT *
+        FROM purchases
+        WHERE (@rowid := @rowid + 1) % 4 = 0
+        ORDER BY timestamp             
+        )    t
+    ORDER BY buyer_name;
+    
+END
+
+/* Solution 2 */
+CREATE PROCEDURE solution()
+BEGIN
+    SET @purchase = 0;
+        SELECT DISTINCT buyer_name AS winners
+        FROM 
+            (
+             SELECT *
+             FROM purchases
+             WHERE (@purchase := @purchase + 1) % 4 = 0
+             ORDER BY timestamp    
+            ) t 
+        ORDER BY buyer_name;
+END
