@@ -1,0 +1,35 @@
+/* Solution 1 */
+CREATE PROCEDURE solution()
+BEGIN
+    SELECT  id,
+            login,
+            name
+    FROM users
+    WHERE type='user'
+    OR type NOT IN ('user')
+    ORDER BY id;
+END
+
+/* Solution 2 */
+CREATE PROCEDURE solution()
+BEGIN
+    SELECT  id,
+            login,
+            name
+    FROM users
+    WHERE type='user'
+    UNION (SELECT id, login,name FROM users WHERE type<>'user')
+    ORDER BY id;
+END
+
+/* Solution 3 */
+CREATE PROCEDURE solution()
+BEGIN
+    SELECT  id,
+            login,
+             name
+    FROM users
+    WHERE type='user'
+    OR type LIKE "%"
+    ORDER BY id;
+END
