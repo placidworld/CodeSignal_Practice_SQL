@@ -1,0 +1,18 @@
+/* Solution 1 */
+CREATE PROCEDURE solution()
+BEGIN
+    SELECT name
+    FROM people_interests
+    WHERE interests & 1 AND interests & 8
+    ORDER BY name;
+END
+
+/* Solution 2 */
+CREATE PROCEDURE solution()
+BEGIN
+    SELECT name
+    FROM people_interests
+    WHERE interests & (FIND_IN_SET('reading', interests) > 0)
+    AND interests & (FIND_IN_SET('drawing', interests) > 0)
+    ORDER BY name;
+END
