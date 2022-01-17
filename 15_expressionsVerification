@@ -1,0 +1,47 @@
+/* Solution 1 */
+CREATE PROCEDURE expressionsVerification()
+BEGIN
+    SELECT * 
+    FROM expressions
+    WHERE CASE operation
+              WHEN "+" THEN a + b = c
+              WHEN "-" THEN a - b = c
+              WHEN "/" THEN a / b = c
+              WHEN "*" THEN a * b = c
+          END;
+END
+
+/* Solution 2 */
+CREATE PROCEDURE solution()
+BEGIN
+    SELECT  id, 
+            a,
+            b,
+            operation,
+            c 
+    FROM 
+        (SELECT *,
+                CASE WHEN operation = '+' THEN a + b
+                     WHEN operation = '-' THEN a - b 
+                     WHEN operation = '*' THEN a * b 
+                     WHEN operation = '/' THEN a / b 
+                END AS d  
+        FROM expressions
+        ) t 
+    WHERE t.c = t.d 
+    ORDER BY id;
+END
+
+/* Solution 3 */
+CREATE PROCEDURE solution()
+BEGIN
+	SELECT * 
+    FROM expressions
+    WHERE CASE operation
+        WHEN '+' THEN a+b
+        WHEN '-' THEN a-b
+        WHEN '*' THEN a*b
+        WHEN '/' THEN a/b
+    END = c
+    ORDER BY id;
+END
