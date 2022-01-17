@@ -1,0 +1,54 @@
+/* Solution 1 */
+CREATE PROCEDURE solution()
+BEGIN
+   SELECT t3.anonym_id as anonym_id, 
+          last_null, 
+          first_notnull FROM
+	   (SELECT anonymous_id as anonym_id, event_name as last_null
+        FROM tracks JOIN (
+        SELECT MAX(received_at) last
+        FROM tracks
+        WHERE user_id IS NULL
+        GROUP BY anonymous_id) t ON received_at = last
+        ) t3
+    LEFT JOIN 
+        (
+        SELECT anonymous_id as anonym_id, event_name as first_notnull
+        FROM tracks JOIN (
+            SELECT MIN(received_at) first
+            FROM tracks
+            WHERE user_id IS NOT NULL
+            GROUP BY anonymous_id) t2 ON received_at = first) t4
+    ON t3.anonym_id  = t4.anonym_id
+    ORDER BY anonym_id;
+END
+
+/* Solution 2 */
+CREATE PROCEDURE solution()
+BEGIN
+   WITH
+        cte_id AS (
+            SELECT DISTINCT anonymous_id AS id FROM tracks
+            ORDER BY anonymous_id ASC
+        ),
+        cte_l AS (
+            SELECT id, (
+                SELECT event_name FROM tracks
+                WHERE anonymous_id = a.id
+                AND user_id IS NOT NULL
+                ORDER BY received_at ASC LIMIT 1
+            ) AS event_name FROM cte_id AS a
+        ),
+        cte_f AS (
+            SELECT id, (
+                SELECT event_name FROM tracks
+                WHERE anonymous_id = a.id
+                AND user_id IS NULL
+                ORDER BY received_at DESC LIMIT 1
+            ) AS event_name FROM cte_id AS a
+        )
+
+    SELECT a.id AS anonym_id, a.event_name AS last_null,
+    b.event_name AS first_notnull FROM cte_f AS a, cte_l AS b
+    WHERE a.id = b.id;
+END
