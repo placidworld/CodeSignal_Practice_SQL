@@ -1,0 +1,53 @@
+/* Solution 1 */
+CREATE PROCEDURE solution()
+BEGIN
+	SELECT  id, 
+            hostname
+    FROM hostnames
+    GROUP BY SUBSTRING_INDEX(CONCAT(" .", hostname), '.', -1),
+             SUBSTRING_INDEX(CONCAT(" ..", hostname), '.', -2),
+             hostname
+    ORDER BY SUBSTRING_INDEX(CONCAT(" .", hostname), '.', -1),
+             SUBSTRING_INDEX(CONCAT(" ..", hostname), '.', -2),
+             hostname;
+END
+
+/* Solution 2 */
+CREATE PROCEDURE solution()
+BEGIN
+SELECT id, hostname 
+    FROM hostnames
+    ORDER BY REVERSE(
+					SUBSTR(CONCAT_WS(".",
+    									SUBSTRING_INDEX(REVERSE(SUBSTRING_INDEX(hostname, ".", 1)), ".", 1),
+    									SUBSTRING_INDEX(REVERSE(SUBSTRING_INDEX(hostname, ".", 2)), ".", 1),
+    									SUBSTRING_INDEX(REVERSE(SUBSTRING_INDEX(hostname, ".", 3)), ".", 1)),
+    							1, CHAR_LENGTH(hostname)));
+END
+
+/* Solution 3 */
+CREATE PROCEDURE solution()
+BEGIN
+   SELECT id, hostname
+    FROM
+        (SELECT 
+                id,
+                hostname,
+                domain3,
+                CASE
+                    WHEN LENGTH(hostname) = LENGTH(domain3) THEN NULL
+                    ELSE SUBSTRING_INDEX(domain2domain3, '.', 1)
+                END AS domain2,
+                CASE
+                    WHEN LENGTH(hostname) = LENGTH(domain2domain3) THEN NULL
+                    ELSE SUBSTRING_INDEX(hostname, '.', 1)
+                END AS domain1
+        FROM
+            (SELECT 
+                    id,
+                    hostname,
+                    SUBSTRING_INDEX(hostname, '.', -1) AS domain3,
+                    SUBSTRING_INDEX(hostname, '.', -2) AS domain2domain3
+            FROM hostnames) AS t1) AS t2
+	ORDER BY domain3, domain2, domain1; 
+END
