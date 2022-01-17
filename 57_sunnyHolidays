@@ -1,0 +1,21 @@
+/* Solution 1 */
+CREATE PROCEDURE solution()
+BEGIN
+    SELECT holiday_date AS ski_date
+    FROM holidays 
+    JOIN 
+         weather 
+    ON 1 = 1 
+    AND holidays.holiday_date = weather.sunny_date
+    ORDER BY holiday_date;
+END
+
+/* Solution 2 */
+CREATE PROCEDURE solution()
+BEGIN
+    SELECT holiday_date as ski_date
+    FROM holidays 
+    INNER JOIN 
+          weather 
+    ON holiday_date = sunny_date;
+END
