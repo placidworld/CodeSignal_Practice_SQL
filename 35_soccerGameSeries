@@ -1,0 +1,74 @@
+/* Solution 1 */
+CREATE PROCEDURE solution()
+BEGIN
+    SELECT
+        CASE 
+            WHEN SUM(IF(first_team_score > second_team_score,1,0)) > SUM(IF(first_team_score < second_team_score,1,0)) THEN 1
+            WHEN SUM(IF(first_team_score > second_team_score,1,0)) < SUM(IF(first_team_score < second_team_score,1,0)) THEN 2
+            WHEN SUM(first_team_score) > SUM(second_team_score) THEN 1
+            WHEN SUM(first_team_score) < SUM(second_team_score) THEN 2
+            WHEN SUM(IF(match_host=2,first_team_score,0)) > SUM(IF(match_host=1,second_team_score,0)) THEN 1
+            WHEN SUM(IF(match_host=2,first_team_score,0)) < SUM(IF(match_host=1,second_team_score,0)) THEN 2
+        ELSE 0 END AS winner
+    FROM scores;
+                    
+END
+
+/* Solution 2 */
+CREATE PROCEDURE solution()
+BEGIN
+    SELECT CASE
+              WHEN wins > 0 THEN 1
+              WHEN wins < 0 THEN 2
+                  ELSE CASE
+                          WHEN goaldiff > 0 THEN 1
+                          WHEN goaldiff < 0 THEN 2
+                              ELSE CASE
+                                    WHEN goalsaway > 0 THEN 1
+                                    WHEN goalsaway < 0 THEN 2
+                                    ELSE 0
+                                    END
+                        END
+            END AS winner 
+    FROM
+        (SELECT SUM(wins) as wins,
+                SUM(goaldiff) as goaldiff,
+                SUM(goalsaway) as goalsaway
+        FROM 
+            (SELECT match_id,
+                    IF(first_team_score = second_team_score, 0, IF(first_team_score > second_team_score, 1, -1)) AS wins,
+                        first_team_score-second_team_score AS goaldiff,
+                    IF(match_host=2, first_team_score, -second_team_score) AS goalsaway
+             FROM scores) dt) dd;
+END
+
+/* Solution 3 */
+CREATE PROCEDURE solution()
+BEGIN
+SELECT 
+     CASE 
+         WHEN stats.`first_team_wins` > stats.`second_team_wins` THEN 1
+         WHEN stats.`second_team_wins`> stats.`first_team_wins` THEN 2
+         WHEN stats.`goal_diff` > 0 THEN 1
+         WHEN stats.`goal_diff` < 0 THEN 2
+         WHEN stats.`first_team_points` > stats.`second_team_points` THEN 1
+         WHEN stats.`second_team_points` > stats.`first_team_points` THEN 2
+         ELSE 0
+     END AS`winner`
+        
+FROM
+     (
+        SELECT
+            SUM(CASE 
+                    WHEN scores.`first_team_score` > scores.`second_team_score` THEN 1 END) AS first_team_wins,
+            SUM(CASE 
+                    WHEN scores.`first_team_score` < scores.`second_team_score` THEN 1 END) AS second_team_wins,
+            SUM(scores.`first_team_score` - scores.`second_team_score`) AS goal_diff,
+            SUM(CASE 
+                    WHEN scores.`match_host` = 2 THEN scores.`first_team_score` END) AS first_team_points,
+            SUM(CASE 
+                    WHEN scores.`match_host` = 1 THEN scores.`second_team_score` END) AS second_team_points
+        FROM scores
+        ) AS stats;
+                    
+END
