@@ -1,0 +1,39 @@
+/* Solution 1 */
+CREATE PROCEDURE solution()
+BEGIN
+    SELECT  starring_actors.actor, 
+            age
+    FROM
+        (movies 
+        JOIN
+        starring_actors
+        ON movies.movie = starring_actors.movie_name)
+    JOIN
+        actor_ages
+    ON starring_actors.actor = actor_ages.actor
+    WHERE genre = 
+          (SELECT genre AS mostCommonGenre
+           FROM
+                (SELECT genre, COUNT(genre) AS genreCount
+                 FROM movies
+                 GROUP BY genre
+                 ORDER BY genreCount DESC
+                  LIMIT 1) AS MCG
+            )
+     ORDER BY age DESC, starring_actors.actor;
+END
+
+/* Solution 2 */
+CREATE PROCEDURE solution()
+BEGIN
+    SET @favGenre = (SELECT genre FROM movies GROUP BY genre ORDER BY COUNT(*) DESC LIMIT 1);
+    SELECT aa.actor as actor, age
+    FROM actor_ages aa 
+    INNER JOIN starring_actors sa 
+    ON aa.actor = sa.actor
+    INNER JOIN movies m 
+    ON sa.movie_name = m.movie
+    WHERE m.genre=@favGenre
+    ORDER BY age DESC, aa.actor;
+END
+
