@@ -1,0 +1,15 @@
+/* Solution 1 */
+CREATE PROCEDURE solution()
+BEGIN
+    SELECT EXTRACTVALUE(xml_doc, '/catalog/book[1]/author') AS author 
+    FROM catalogs
+    ORDER BY author;
+END
+
+/* Solution 2 */
+CREATE PROCEDURE solution()
+BEGIN
+    SELECT DISTINCT SUBSTRING_INDEX(ExtractValue(xml_doc, "//author"), " ", 2) AS author 
+    FROM catalogs 
+    ORDER BY author;
+END
