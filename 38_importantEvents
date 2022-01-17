@@ -1,0 +1,19 @@
+/* Solution 1 */
+CREATE PROCEDURE solution()
+BEGIN
+    SELECT id,
+           name,
+           event_date,
+           participants
+    FROM events
+    ORDER BY WEEKDAY(event_date), participants DESC; 
+END
+
+/* Solution 2 */
+CREATE PROCEDURE solution()
+BEGIN
+    SELECT *
+    FROM events
+    ORDER BY (DAYOFWEEK(event_date) + 5) % 7, participants DESC;
+END
+
