@@ -1,0 +1,25 @@
+/* Solution 1 */
+CREATE PROCEDURE solution()
+BEGIN
+    SELECT s.id, s.name, s.club_id 
+    FROM students s 
+    INNER JOIN
+        clubs c 
+    ON s.club_id = c.id     
+    ORDER BY s.id;
+END
+
+/* Solution 2 */
+CREATE PROCEDURE solution()
+BEGIN
+    SELECT * 
+    FROM students
+    WHERE EXISTS (
+        SELECT *
+        FROM clubs 
+        WHERE clubs.id  = students.club_id
+    )
+    ORDER BY students.id;
+END
+
+/* Solution 3 */
