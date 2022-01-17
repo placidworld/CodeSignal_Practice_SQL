@@ -1,0 +1,22 @@
+/* Solution 1 */
+CREATE PROCEDURE solution()
+BEGIN
+    SELECT d.dep_name
+    FROM departments  d
+    WHERE d.id NOT IN (
+        SELECT department as id 
+        FROM employees)
+    ORDER BY d.id;
+END
+
+/* Solution 2 */
+CREATE PROCEDURE solution()
+BEGIN
+    SELECT dep_name
+    FROM departments 
+    WHERE NOT EXISTS (
+        SELECT *
+        FROM employees
+        WHERE employees.department = departments.id)
+    ORDER BY id;
+END
