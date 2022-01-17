@@ -1,0 +1,34 @@
+/* Solution 1 */
+CREATE PROCEDURE solution()
+BEGIN
+    SELECT  id,
+            email_title,
+            CASE WHEN size >= POWER(2,20) THEN CONCAT(FLOOR(size /POWER(2,20)), ' Mb') 
+                 WHEN size >= POWER(2, 10) THEN CONCAT(FLOOR(size/POWER(2,10)), ' Kb')
+            ELSE '0 Kb'
+            END AS short_size
+    FROM emails
+    ORDER BY size DESC;  
+END
+
+/* Solution 2 */
+CREATE PROCEDURE solution()
+BEGIN
+    SELECT  id, 
+            email_title, 
+            CASE
+                WHEN size >= 1048576 THEN CONCAT(FLOOR(size / 1048576), ' Mb') 
+                ELSE CONCAT(FLOOR(size / 1024), ' Kb')
+            END  as short_size
+        FROM emails
+        ORDER BY size DESC;
+END
+
+/* Solution 3 */
+CREATE PROCEDURE solution()
+BEGIN
+    SELECT  id, 
+            email_title, 
+            CONCAT(FLOOR(IF(size < POW(2, 20),(size / POW(2, 10)), (size / POW(2, 20)))), " ", IF(size < POW(2, 20), "Kb", "Mb")) AS short_size FROM emails
+    ORDER BY size DESC;
+END
