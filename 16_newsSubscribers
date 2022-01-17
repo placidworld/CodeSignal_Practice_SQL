@@ -1,0 +1,30 @@
+/* Solution 1 */
+CREATE PROCEDURE solution()
+BEGIN
+    SELECT *
+    FROM (
+         SELECT subscriber
+         FROM full_year
+         WHERE newspaper LIKE '%Daily%'
+         
+         UNION
+         
+         SELECT subscriber
+         FROM half_year
+         WHERE newspaper LIKE '%Daily%') full 
+    ORDER BY subscriber;
+END
+
+/* Solution 2 */
+CREATE PROCEDURE solution()
+BEGIN
+    SELECT DISTINCT u.subscriber
+    FROM 
+        ( SELECT * 
+          FROM full_year
+          UNION 
+          SELECT * 
+          FROM half_year) as u
+    WHERE u.newspaper LIKE '%Daily%'
+    ORDER BY u.subscriber;
+END
