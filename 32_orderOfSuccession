@@ -1,0 +1,16 @@
+/* Solution 1 */
+CREATE PROCEDURE solution()
+BEGIN
+    SELECT CASE WHEN gender = 'F' THEN CONCAT('Queen ', name) 
+                ELSE CONCAT('King ', name) END AS name 
+    FROM Successors
+    ORDER BY birthday;
+END
+
+/* Solution 2 */
+CREATE PROCEDURE solution()
+BEGIN
+    SELECT CONCAT(IF(gender='M','King ', 'Queen '), name) as name
+    FROM Successors
+    ORDER BY birthday;
+END
