@@ -1,0 +1,34 @@
+/* Solution 1 */
+CREATE PROCEDURE solution()
+BEGIN
+    SELECT  name,
+            surname,
+            phone_number
+    FROM phone_numbers 
+    WHERE phone_number REGEXP '^1-[0-9]{3}-[0-9]{3}-[0-9]{4}$'
+          OR
+          phone_number REGEXP '^[(]1[)][0-9]{3}-[0-9]{3}-[0-9]{4}$'   
+    ORDER BY surname
+    ;
+END
+
+/* Solution 2 */
+CREATE PROCEDURE solution()
+BEGIN
+    SELECT *
+    FROM phone_numbers
+    WHERE phone_number REGEXP '^1-[0-9]{3}-[0-9]{3}-[0-9]{4}$' 
+    OR phone_number REGEXP '^\\(1\\)[0-9]{3}-[0-9]{3}-[0-9]{4}$'
+    ORDER BY surname;
+END
+
+/* Solution 3 */
+CREATE PROCEDURE solution()
+BEGIN
+    SELECT name, 
+           surname, 
+           phone_number
+    FROM phone_numbers WHERE phone_number
+    REGEXP "^(?>\\(1\\)|1-)\\d{3}-\\d{3}-\\d{4}$"
+    ORDER BY surname;
+END
