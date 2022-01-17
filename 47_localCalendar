@@ -1,0 +1,36 @@
+/* Solution 1 */
+CREATE PROCEDURE solution()
+BEGIN
+    SELECT e.event_id,
+           IF(
+              s.hours = 24,
+              DATE_FORMAT(DATE_ADD(e.date, INTERVAL s.timeshift MINUTE), "%Y-%m-%d %H:%i"),
+              DATE_FORMAT(DATE_ADD(e.date, INTERVAL s.timeshift MINUTE), "%Y-%m-%d %h:%i %p")
+              ) AS formatted_date
+    FROM events  e 
+    JOIN 
+         settings s 
+    ON e.user_id = s.user_id
+    ORDER BY event_id;
+END
+
+/* Solution 2 */
+CREATE PROCEDURE solution()
+BEGIN
+    SELECT events.event_id, 
+           IF(settings.hours=24, 
+           DATE_FORMAT(DATE_ADD(events.`date`, INTERVAL settings.timeshift MINUTE), "%Y-%m-%d %H:%i"),
+           DATE_FORMAT(DATE_ADD(events.`date`, INTERVAL settings.timeshift MINUTE), "%Y-%m-%d %h:%i %p")) AS formatted_date
+    FROM events events INNER JOIN settings settings ON 1 = 1
+    AND events.user_id = settings.user_id
+    ORDER BY event_id;
+END
+
+/* Solution 3 */
+CREATE PROCEDURE solution()
+BEGIN
+    SELECT  event_id, 
+            DATE_FORMAT(ADDDATE(date, INTERVAL timeshift MINUTE), CONCAT('%Y-%m-%d ',IF(hours=12,'%h:%i %p','%H:%i'))) AS formatted_date
+    FROM events JOIN settings USING(user_id)
+    ORDER BY event_id;
+END
