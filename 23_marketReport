@@ -1,0 +1,28 @@
+/* Solution 1 */
+CREATE PROCEDURE solution()
+BEGIN
+    WITH CTE AS
+    (SELECT country, COUNT(country) AS competitors
+    FROM foreignCompetitors
+    GROUP BY country
+    ORDER BY country)
+    
+    SELECT  country,
+            competitors
+    FROM CTE 
+    
+    UNION ALL
+    SELECT  "Total:" AS country,
+            COUNT(country) AS competitors
+    FROM foreignCompetitors;
+           
+END
+
+/* Solution 2 */
+CREATE PROCEDURE solution()
+BEGIN
+    SELECT  IFNULL(country, 'Total:') AS country,
+	        COUNT(*) AS "competitors"
+    FROM foreignCompetitors
+    GROUP BY country WITH ROLLUP;           
+END
