@@ -1,0 +1,40 @@
+/* Solution 1 */
+CREATE PROCEDURE solution()
+BEGIN
+	SELECT  id, 
+            IF(SUM(expenditure_sum)-value <0, 0, SUM(expenditure_sum)-value) AS loss
+    FROM allowable_expenditure ae 
+    CROSS JOIN
+        (SELECT monday_date, 
+                week(monday_date, 3) AS weeknum,
+                expenditure_sum
+         FROM expenditure_plan 
+         ) ep 
+    ON 1 = 1
+    WHERE ep.weeknum BETWEEN ae.left_bound AND ae.right_bound
+    GROUP BY ae.id 
+    ORDER BY ae.id;
+END
+
+/* Solution 2 */
+CREATE PROCEDURE solution()
+BEGIN
+    SELECT  id, 
+            IF(SUM(expenditure_sum) > value, SUM(expenditure_sum) - value, 0) as loss
+    FROM allowable_expenditure
+    JOIN expenditure_plan 
+    ON   WEEK(monday_date, 3) <= right_bound 
+    AND  WEEK(monday_date, 3) >= left_bound
+    GROUP BY id, value;
+END
+
+/* Solution 3 */
+CREATE PROCEDURE solution()
+BEGIN
+    SELECT  ae.id AS id,
+            IF(SUM(ep.expenditure_sum) < ae.value, 0, SUM(ep.expenditure_sum) - ae.value) AS loss
+    FROM  expenditure_plan AS ep, 
+          allowable_expenditure AS ae
+    WHERE WEEK(monday_date) BETWEEN ae.left_bound AND ae.right_bound 
+    GROUP BY ae.id;
+END
