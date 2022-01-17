@@ -1,0 +1,14 @@
+CREATE PROCEDURE solution()
+BEGIN
+    SET @a = CONCAT (
+                      (SELECT GROUP_CONCAT(
+                                    CONCAT('select "',
+                                            query_name,
+                                            '" query_name, 
+                                            (', code, ') val')
+                            separator ' union ' )
+                        FROM queries)
+                        , ' order by 1');
+    prepare qry from @a;
+    execute qry;
+END
