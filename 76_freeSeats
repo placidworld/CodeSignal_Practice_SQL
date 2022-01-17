@@ -1,0 +1,51 @@
+/* Solution 1 */
+CREATE PROCEDURE solution()
+BEGIN
+    SELECT flight_id, (number_of_seats - taken_seats) AS free_seats
+    FROM
+        (SELECT flight_id, 
+                plane_id AS pid, 
+                IF(taken_seats IS NULL, 0, taken_seats) AS taken_seats
+        FROM  flights
+        LEFT JOIN
+              (SELECT flight_id AS fid, 
+                      COUNT(seat_no) AS taken_seats
+               FROM purchases
+               GROUP BY flight_id) AS t1
+        ON flights.flight_id = t1.fid) AS t2
+    JOIN planes
+    ON planes.plane_id = t2.pid
+    ORDER BY flight_id;    
+END
+
+/* Solution 2 */
+CREATE PROCEDURE solution()
+BEGIN
+    SELECT  flight_id, 
+            number_of_seats - sold_seats AS free_seats 
+    FROM  planes 
+    JOIN 
+          (SELECT plane_id, 
+                  flight_id, 
+                  Count(seat_no) as sold_seats
+          FROM flights 
+          LEFT JOIN purchases USING(flight_id)
+    GROUP BY flight_id) AS t USING(plane_id)
+    ORDER BY flight_id;
+END
+
+/* Solution 3 */
+CREATE PROCEDURE solution()
+BEGIN
+    SELECT f.flight_id,
+    IFNULL(
+    (
+        SELECT (p.number_of_seats - c.value)
+        FROM (
+            SELECT flight_id, COUNT(flight_id) AS value
+            FROM purchases GROUP BY flight_id
+        ) AS c WHERE c.flight_id = f.flight_id
+    ), p.number_of_seats) AS free_seats
+    FROM flights AS f INNER JOIN planes AS p
+    ON f.plane_id = p.plane_id ORDER BY flight_id;
+END
