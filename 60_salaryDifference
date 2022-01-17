@@ -1,0 +1,55 @@
+/* Solution 1 */
+CREATE PROCEDURE solution()
+BEGIN
+	SET @maxsal = (SELECT MAX(salary) FROM employees);
+    SET @minsal = (SELECT MIN(salary) FROM employees);
+    SET @diffsal = 
+        (
+        SELECT 
+            SUM(
+                CASE WHEN @maxsal = salary AND @minsal = salary THEN 0
+                     WHEN @maxsal = salary THEN salary
+                     WHEN @minsal = salary THEN -salary
+                ELSE 0
+                END) AS salary_diff
+        FROM employees
+        );
+        
+    SELECT ROUND(IF(ISNULL(@diffsal), 0, @diffsal), 0) AS salary_diff;
+END
+
+/* Solution 2 */
+CREATE PROCEDURE solution()
+BEGIN
+    SELECT IFNULL(maxd - mind, 0) AS difference 
+    FROM 
+        (SELECT mins * COUNT(*) AS mind 
+         FROM employees e 
+         JOIN
+            (SELECT MIN(salary) AS mins
+             FROM employees 
+             LIMIT 1) tmin 
+        ON e.salary = mins ) t1,
+        (SELECT maxs * COUNT(*) AS maxd 
+         FROM employees e 
+         JOIN
+            (SELECT MAX(salary) AS maxs
+             FROM employees 
+             LIMIT 1) tmax 
+        ON e.salary = maxs ) t2; 
+END
+
+/* Solution 3 */
+CREATE PROCEDURE solution()
+BEGIN
+   SELECT COALESCE(((SELECT MAX(salary) FROM employees) *
+    (
+        SELECT COUNT(salary) FROM employees
+        WHERE salary = (SELECT MAX(salary) FROM employees)
+    )) - (SELECT MIN(salary) FROM employees) *
+    (
+        SELECT COUNT(salary) FROM employees
+        WHERE salary = (SELECT MIN(salary) FROM employees)
+    ), 0) AS difference;
+END
+
