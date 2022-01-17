@@ -1,0 +1,15 @@
+/* Solution 1 */
+CREATE PROCEDURE solution()
+BEGIN
+    SELECT DATE_FORMAT(date_str, "%Y-%m-%d") AS date_iso
+    FROM documents 
+    ORDER BY id;        
+END
+
+/* Solution 2 */
+CREATE PROCEDURE solution()
+BEGIN
+    SELECT Date(date_str) AS date_iso
+    FROM documents
+    ORDER BY id;   
+END
