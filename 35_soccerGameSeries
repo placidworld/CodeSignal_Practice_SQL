@@ -54,8 +54,7 @@ SELECT
          WHEN stats.`first_team_points` > stats.`second_team_points` THEN 1
          WHEN stats.`second_team_points` > stats.`first_team_points` THEN 2
          ELSE 0
-     END AS`winner`
-        
+     END AS`winner`       
 FROM
      (
         SELECT
@@ -69,6 +68,5 @@ FROM
             SUM(CASE 
                     WHEN scores.`match_host` = 1 THEN scores.`second_team_score` END) AS second_team_points
         FROM scores
-        ) AS stats;
-                    
+        ) AS stats;       
 END
