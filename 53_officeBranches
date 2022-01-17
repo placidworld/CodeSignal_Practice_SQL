@@ -1,0 +1,27 @@
+/* Solution 1 */
+CREATE PROCEDURE solution()
+BEGIN
+    DELETE FROM branch_types WHERE name LIKE '%-outdated';
+
+    SELECT br.branch_id, 
+           br.name, 
+           CASE WHEN tp.id IS NULL THEN NULL ELSE br.branchtype_id END AS branchtype_id
+    FROM branches br 
+    LEFT JOIN
+         branch_types tp 
+    ON   br.branchtype_id = tp.id 
+    ORDER BY branch_id;
+END
+
+/* Solution 2 */
+CREATE PROCEDURE solution()
+BEGIN
+    ALTER TABLE branches ADD FOREIGN KEY (branchtype_id)
+    REFERENCES branch_types(id)
+    ON DELETE SET NULL;
+
+    DELETE FROM branch_types WHERE name LIKE '%-outdated';
+
+    SELECT * FROM branches
+    ORDER BY branch_id;
+END
