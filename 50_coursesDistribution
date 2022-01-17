@@ -1,0 +1,38 @@
+/* Solution 1 */
+CREATE PROCEDURE solution()
+BEGIN
+    DELETE FROM courses WHERE name LIKE '%-toremove';
+    
+    SELECT gc.group_id, gc.course_id
+    FROM groupcourses  gc 
+    INNER JOIN
+          courses   c 
+    ON gc.course_id = c.id 
+    
+    UNION
+    SELECT ge.group_id, ge.course_id
+    FROM groupexams ge 
+    INNER JOIN
+          courses   c 
+    ON ge.course_id = c.id 
+     ORDER BY group_id, course_id;
+END
+
+/* Solution 2 */
+CREATE PROCEDURE solution()
+BEGIN
+    ALTER TABLE groupcourses ADD FOREIGN KEY (course_id)
+    REFERENCES courses(id) ON DELETE CASCADE;
+
+    ALTER TABLE groupexams ADD FOREIGN KEY (course_id)
+    REFERENCES courses(id) ON DELETE CASCADE;
+
+    DELETE FROM courses WHERE name LIKE '%-toremove';
+
+    SELECT group_id, course_id
+    FROM groupcourses
+    UNION
+    SELECT group_id, course_id
+    FROM groupexams
+    ORDER BY group_id, course_id;
+END
