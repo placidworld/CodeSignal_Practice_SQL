@@ -1,0 +1,67 @@
+/* Solution 1 */
+CREATE PROCEDURE solution()
+BEGIN
+
+    SELECT  s.arbiter_id,
+            s.first_criterion,
+            s.second_criterion,
+            s.third_criterion
+    FROM   scores s, 
+        (
+        SELECT  MAX(first_criterion) AS max1,
+                MAX(second_criterion) AS max2,
+                MAX(third_criterion) AS max3,
+                MIN(first_criterion) AS min1,
+                MIN(second_criterion) AS min2,
+                MIN(third_criterion) AS min3
+        FROM scores
+        LIMIT 1) t  
+    WHERE 
+        (
+        IF(first_criterion = max1 or first_criterion = min1, 1, 0) 
+        + 
+        IF(second_criterion = max2 or second_criterion = min2, 1, 0) 
+        +
+        IF(third_criterion = max3 or third_criterion = min3, 1, 0)    
+        ) < 2;
+END
+
+/* Solution 2 */
+CREATE PROCEDURE solution()
+BEGIN
+    SELECT it.arbiter_id, it.first_criterion,
+    it.second_criterion, it.third_criterion
+    FROM (
+        SELECT *, IF(
+            first_criterion = (SELECT MAX(first_criterion) FROM scores) OR
+            first_criterion = (SELECT MIN(first_criterion) FROM scores), 1, 0
+        ) + IF(
+            second_criterion = (SELECT MAX(second_criterion) FROM scores) OR
+            second_criterion = (SELECT MIN(second_criterion) FROM scores), 1, 0
+        ) + IF(
+            third_criterion = (SELECT MAX(third_criterion) FROM scores) OR
+            third_criterion = (SELECT MIN(third_criterion) FROM scores), 1, 0
+        )
+        AS filter
+        FROM scores GROUP BY arbiter_id
+    ) AS it WHERE it.filter <= 1;
+END
+
+/* Solution 3 */
+CREATE PROCEDURE solution()
+BEGIN
+    SET @firstMax = (SELECT MAX(first_criterion) FROM scores);
+    SET @secondMax = (SELECT MAX(second_criterion) FROM scores);
+    SET @thirdMax = (SELECT MAX(third_criterion) FROM scores);
+    SET @firstMin = (SELECT MIN(first_criterion) FROM scores);
+    SET @secondMin = (SELECT MIN(second_criterion) FROM scores);
+    SET @thirdMin = (SELECT MIN(third_criterion) FROM scores);
+
+    SELECT *
+    FROM scores
+    WHERE 
+        (first_criterion = @firstMax OR first_criterion = @firstMin) +
+        (second_criterion = @secondMax OR second_criterion = @secondMin) +
+        (third_criterion = @thirdMax OR third_criterion = @thirdMin)
+        < 2;
+END
