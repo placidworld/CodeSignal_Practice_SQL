@@ -1,0 +1,21 @@
+/* Solution 1 */
+CREATE PROCEDURE solution()
+BEGIN
+    SELECT 
+        YEAR(date) AS year,
+        QUARTER(date) AS quarter,
+        SUM(profit) - SUM(loss) AS net_profit
+    FROM accounting
+    GROUP BY year, quarter
+    ORDER by year, quarter;
+END
+
+/* Solution 2 */
+CREATE PROCEDURE solution()
+BEGIN
+    SELECT  YEAR(date) AS year, 
+            QUARTER(date) AS quarter,
+            (SUM(profit) - SUM(loss)) AS net_profit 
+    FROM accounting
+    GROUP BY quarter, year ORDER BY year ASC, quarter ASC;
+END
