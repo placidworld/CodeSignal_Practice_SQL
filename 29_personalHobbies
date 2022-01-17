@@ -1,0 +1,18 @@
+/* Solution 1 */
+CREATE PROCEDURE solution()
+BEGIN
+    SELECT name
+    FROM people_hobbies
+    WHERE hobbies LIKE '%sports%' 
+    AND hobbies LIKE '%reading%'
+    ORDER BY name;
+END
+
+/* Solution 2 */
+CREATE PROCEDURE solution()
+BEGIN
+    SELECT name
+    FROM people_hobbies
+    WHERE hobbies & 3  =3
+    ORDER BY name;
+END
