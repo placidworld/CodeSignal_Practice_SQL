@@ -1,0 +1,77 @@
+/* Solution 1 */
+CREATE PROCEDURE solution()
+BEGIN
+    SELECT  *
+    FROM 
+        (
+         SELECT id,
+                'name' AS column_name,
+                name AS value 
+        FROM workers_info 
+        UNION
+        SELECT  id,
+                'date_of_birth' AS column_name,
+                date_of_birth AS value 
+        FROM workers_info 
+        UNION
+        SELECT  id,
+                'salary' AS column_name,
+                salary AS value 
+        FROM workers_info
+        ) a 
+    WHERE value IS NOT NULL 
+    ORDER BY a.id, FIELD(a.column_name, "name", "date_of_birth", "salary");
+END
+
+/* Solution 2 */
+CREATE PROCEDURE solution()
+BEGIN
+    SELECT * 
+        FROM (
+                SELECT id, 
+                       'name' AS column_name, 
+                        name AS value
+                FROM workers_info WHERE name IS NOT NULL 
+                UNION
+                SELECT id, 
+                       'date_of_birth' AS column_name, 
+                       date_of_birth AS value
+                FROM workers_info 
+                WHERE date_of_birth IS NOT NULL
+                UNION
+                SELECT id, 
+                       'salary' AS column_name, 
+                       salary AS value
+                FROM workers_info 
+                WHERE salary IS NOT NULL
+                ) t
+        ORDER BY id, 
+                CASE column_name 
+                    WHEN 'name' THEN 1
+                    WHEN 'date_of_birth' THEN 2
+                    WHEN 'salary' THEN 3 END;
+
+END
+
+/* Solution 3 */
+CREATE PROCEDURE solution()
+BEGIN
+    SELECT  id, 
+            'name' AS column_name, 
+            name AS value
+    FROM workers_info
+    WHERE name IS NOT NULL
+    UNION
+    SELECT  id, 
+            'date_of_birth', 
+            date_of_birth
+    FROM workers_info
+    WHERE date_of_birth IS NOT NULL
+    UNION
+    SELECT  id, 
+            'salary', 
+            salary
+    FROM workers_info
+    WHERE salary IS NOT NULL
+    ORDER BY id, FIELD(column_name, 'name', 'date_of_birth', 'salary');
+END
