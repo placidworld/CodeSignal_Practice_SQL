@@ -1,0 +1,26 @@
+/* Solution 1 */
+CREATE PROCEDURE solution()
+BEGIN
+    SELECT COUNT(*) AS "number_of_nulls"
+    FROM departments 
+    WHERE TRIM(description) in ('NULL', 'NIL', '-')
+    OR description IS NULL;
+END
+
+/* Solution 2 */
+CREATE PROCEDURE solution()
+BEGIN
+    SELECT COUNT(id) AS number_of_nulls 
+    FROM departments
+    WHERE description IS NULL OR 
+    TRIM(description) IN ("null", "nil", "-");
+END
+
+/* Solution 3 */
+CREATE PROCEDURE solution()
+BEGIN
+    SELECT count(*) AS number_of_nulls
+    FROM departments
+    WHERE description REGEXP '^[[:space:]]*(NULL|nil|-)[[:space:]]*$' 
+    OR description IS NULL;
+END
