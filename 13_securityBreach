@@ -1,0 +1,31 @@
+/* Solution 1 */
+CREATE PROCEDURE solution()
+BEGIN
+    SELECT first_name,
+           second_name,
+           attribute
+    FROM  users
+    WHERE attribute LIKE CONCAT('_%\%', BINARY(first_name), '\_', BINARY(second_name), '\%%')
+    ORDER BY attribute;
+END
+
+/* Solution 2 */
+CREATE PROCEDURE solution()
+BEGIN
+    SELECT first_name,
+           second_name,
+           attribute
+    FROM  users
+    WHERE attribute LIKE BINARY CONCAT('_%\%', first_name, '\_', second_name, '\%%')
+    ORDER BY attribute;
+END
+
+/* Solution 3 */
+CREATE PROCEDURE solution()
+BEGIN
+    SELECT first_name, second_name, attribute
+    FROM users 
+    WHERE
+    REGEXP_LIKE(attribute, CONCAT("\\w+%", first_name, "_", second_name, "%", "\\w*"), "c")
+    ORDER BY attribute; 
+END
