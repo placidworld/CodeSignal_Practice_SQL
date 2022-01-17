@@ -1,0 +1,135 @@
+/* Solution 1 */
+CREATE PROCEDURE solution()
+BEGIN
+    CREATE TABLE IF NOT EXISTS Names (
+        min_date date,
+        driver_name VARCHAR(20),
+        NamesInfo VARCHAR(100)
+    );
+
+    INSERT INTO Names
+    SELECT  date, 
+            driver_name, 
+            NamesInfo 
+    FROM
+        (SELECT 
+             (MIN(date) - INTERVAL 1 DAY) AS date,
+              driver_name, 
+              CONCAT(' Name: ', driver_name, '; number of inspections: ', COUNT(driver_name), '; miles driven: ', SUM(miles_logged)) AS NamesInfo
+        FROM inspections
+        GROUP BY driver_name) AS t1;
+
+    CREATE TABLE IF NOT EXISTS Dates (
+        inspection_date date,
+        driver_name VARCHAR(20),
+        InspectionsInfo VARCHAR(100)
+    );
+
+    INSERT INTO Dates
+    SELECT  date, 
+            driver_name, 
+             InspectionsInfo 
+    FROM
+        (SELECT
+              date,
+              driver_name,
+              CONCAT('  date: ', date, '; miles covered: ', miles_logged) AS InspectionsInfo
+         FROM inspections) AS t3;
+
+    SELECT *
+    FROM
+        (SELECT CONCAT(' Total miles driven by all drivers combined: ', SUM(miles_logged)) AS summary
+        FROM inspections) AS t3
+    UNION
+        (SELECT info
+        FROM
+          (SELECT *
+              FROM
+                (SELECT min_date AS date, driver_name, NamesInfo AS info FROM Names) AS t1
+              UNION
+                (SELECT inspection_date AS date, driver_name, InspectionsInfo AS info FROM Dates)
+              ORDER BY driver_name, date) AS t2);
+              
+DROP TABLE Names;
+DROP TABLE Dates;
+END
+
+/* Solution 2 */
+CREATE PROCEDURE solution()
+BEGIN
+    DECLARE done INT DEFAULT FALSE;
+    DECLARE name VARCHAR(250) DEFAULT '';
+    DECLARE cur1 CURSOR FOR SELECT * FROM names;
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+    DROP TABLE IF EXISTS tmp;
+    CREATE TEMPORARY TABLE tmp (summary VARCHAR(250));
+    DROP TABLE IF EXISTS names;
+    CREATE TEMPORARY TABLE names AS SELECT DISTINCT driver_name FROM inspections
+    ORDER BY driver_name;
+    SET @name = '';
+    OPEN cur1;
+    
+    INSERT INTO tmp VALUES(CONCAT(' Total miles driven by all drivers combined: ', (SELECT SUM(miles_logged) FROM inspections)));
+    
+read_loop: LOOP
+    FETCH cur1 INTO name;
+    IF done THEN
+      LEAVE read_loop;
+    END IF;
+    INSERT INTO tmp VALUES((SELECT CONCAT(' Name: ', driver_name, '; number of inspections: ', COUNT(*), '; miles driven: ', SUM(miles_logged)) AS summary FROM inspections GROUP BY driver_name HAVING driver_name = name));
+    INSERT INTO tmp (summary)
+        SELECT CONCAT('  date: ', date, '; miles covered: ', miles_logged) AS summary FROM inspections WHERE driver_name = name
+    ORDER BY date;
+  END LOOP;
+
+  CLOSE cur1;
+  SELECT summary FROM tmp;
+END
+
+/* Solution 3 */
+CREATE PROCEDURE solution()
+BEGIN
+    DROP TABLE IF EXISTS names;
+    CREATE TABLE names (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        name VARCHAR(100)
+    );
+    
+    DROP TABLE IF EXISTS summary;
+    CREATE TABLE summary (
+        value VARCHAR(255)
+    );
+    
+    INSERT INTO names (name)
+    SELECT DISTINCT driver_name FROM inspections
+    ORDER BY driver_name;
+    
+    INSERT INTO summary (value)
+    SELECT CONCAT(
+    ' Total miles driven by all drivers combined: ',
+    SUM(miles_logged)) FROM inspections;
+    
+    SET @id := 1;
+    WHILE (SELECT COUNT(*) FROM names WHERE id = @id) = 1 DO
+        
+        INSERT INTO summary (value)
+        SELECT CONCAT(
+            ' Name: ', driver_name,
+            '; number of inspections: ', COUNT(driver_name),
+            '; miles driven: ', SUM(miles_logged)
+        ) FROM inspections WHERE driver_name =
+        (SELECT name FROM names WHERE id = @id);
+        
+        INSERT INTO summary (value)
+        SELECT CONCAT(
+            '  date: ', date,
+            '; miles covered: ', miles_logged
+        ) FROM inspections WHERE driver_name =
+        (SELECT name FROM names WHERE id = @id)
+        ORDER BY date;
+        
+        SET @id := @id + 1;
+    END WHILE;
+    
+    SELECT value AS summary FROM summary;
+END
