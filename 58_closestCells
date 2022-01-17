@@ -1,0 +1,41 @@
+/* Solution 1 */
+CREATE PROCEDURE solution()
+BEGIN
+    SELECT  t1.id AS id1,
+            (SELECT t2.id
+            FROM positions t2
+            WHERE t1.id != t2.id
+            ORDER BY ST_Distance(Point(t1.x,t1.y),Point(t2.x,t2.y)) 
+            LIMIT 1
+            ) AS id2          
+    FROM positions t1
+    ;   
+END
+
+/* Solution 2 */
+CREATE PROCEDURE solution()
+BEGIN
+    SELECT  DISTINCT(t.id1) as id1, 
+            t.id2 as id2
+    FROM 
+        (SELECT p.id AS id1, 
+                r.id AS id2, 
+                ST_Distance(Point(p.x,p.y), Point(r.x,r.y)) AS dist
+        FROM positions p, positions r
+        WHERE p.id <> r.id
+        ORDER By dist) AS t 
+    INNER JOIN 
+          (SELECT f.id1, 
+                  MIN(f.dist) as dist
+           FROM   
+                (SELECT p.id AS id1, 
+                        r.id AS id2, 
+                        ST_Distance(Point(p.x,p.y), Point(r.x,r.y)) AS dist
+                FROM positions p, positions r
+                WHERE p.id <> r.id
+                ORDER By dist) AS f 
+            GROUP BY f.id1) AS g 
+    ON t.id1 = g.id1 
+    AND t.dist = g.dist
+    ORDER BY id1;
+END
