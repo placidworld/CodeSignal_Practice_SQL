@@ -1,0 +1,33 @@
+/* Solution 1 */
+REATE PROCEDURE correctIPs()
+BEGIN
+    SELECT  id, 
+            ip 
+    FROM ips
+    WHERE ip REGEXP "(\\d{2}\.\\d+)| (\.\\d{2}$)"
+    AND IS_IPV4(ip) 
+    ORDER BY id;
+END
+
+/* Solution 2 */
+CREATE PROCEDURE correctIPs()
+BEGIN
+    SELECT *
+    FROM ips
+    WHERE ip REGEXP '^([0-1]?[0-9]{1,2}|2[0-4][0-9]|25[0-5])\\.([0-1]?[0-9]{1,2}|2[0-4][0-9]|25[0-5])\\.([1-9][0-9]\\.([0-1]?[0-9]{1,2}|2[0-4][0-9]|25[0-5])|([0-1]?[0-9]{1,2}|2[0-4][0-9]|25[0-5])\\.[1-9][0-9])$'
+    ORDER BY id;
+END
+
+/* Solution 3 */
+CREATE PROCEDURE correctIPs()
+BEGIN
+    SELECT *
+    FROM ips
+    WHERE (
+    	       ips.`ip` REGEXP '^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{2,3}\.[0-9]{1,3}$'
+    	       OR 
+    	       ips.`ip` REGEXP '^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{2,3}$')
+    	       AND
+    	       INET_ATON(ips.`ip`)
+    ORDER BY ID;
+END
