@@ -1,0 +1,36 @@
+/* Solution 1 */
+CREATE PROCEDURE solution()
+BEGIN
+    SET @startdate := (SELECT input_date FROM userInput);
+    SET @enddate = CONCAT(YEAR(@startdate), "-12-31", "23:59:59");
+    
+    WHILE DATE_ADD(@startdate, INTERVAL 7 DAY) <= @enddate DO
+        SET @startdate := DATE_ADD(@startdate, INTERVAL 7 DAY);
+        INSERT INTO userInput(input_date) VALUES (@startdate);
+    END WHILE;
+    
+    SELECT input_date AS alarm_date
+    FROM userInput 
+    ORDER BY alarm_date; 
+END
+
+/* Solution 2 */
+CREATE PROCEDURE solution()
+BEGIN
+    DROP TABLE IF EXISTS tmp;
+    CREATE TABLE IF NOT EXISTS tmp (alarm_date DATETIME);
+  
+    SELECT input_date FROM userInput INTO @ldate;
+    SET @y = YEAR(@ldate) + 1;
+    test_loop : LOOP
+        IF (YEAR(@ldate) = @y) THEN
+            LEAVE test_loop;
+        END IF;
+
+        INSERT INTO tmp VALUES(@ldate);
+        SET @ldate = ADDDATE(@ldate, INTERVAL 1 WEEK);
+  END LOOP; 
+  
+  SELECT alarm_date FROM tmp;  
+END
+
