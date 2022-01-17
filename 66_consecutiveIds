@@ -1,0 +1,9 @@
+CREATE PROCEDURE solution()
+BEGIN
+    SET @newid = 0;
+    
+    SELECT  id AS oldId,
+            @newid := @newid + 1  AS newId
+    FROM itemIds
+    ORDER BY id;
+END
